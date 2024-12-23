@@ -2,9 +2,11 @@ package main
 
 import (
 	"bwastartup/auth"
+	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
 	"bwastartup/user"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -25,19 +27,40 @@ func main() {
 
 	// fmt.Println("terkoneksi")
 
+	//Inisialisasi User
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
-
 	userHandler := handler.NewUserHandler(userService, authService)
+
+	//inisialisasi Campaign
+	campaignRepository := campaign.NewRepository(db)
+	campaigns, err := campaignRepository.FindByUserID(1)
+
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println(len(campaigns))
+
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println("jumlah gambar")
+			fmt.Println(len(campaign.CampaignImages))
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+	}
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
 
+	//API User
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	//API Campaign
 
 	router.Run()
 
