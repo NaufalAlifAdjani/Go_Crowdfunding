@@ -8,16 +8,16 @@ import (
 
 type Service interface {
 	GenerateToken(userID int) (string, error)
-	validateToken(token string) (*jwt.Token, error)
+	ValidateToken(token string) (*jwt.Token, error)
 }
 
 type jwtservice struct {
 }
 
 // validateToken implements Service.
-func (s *jwtservice) validateToken(token string) (*jwt.Token, error) {
-	panic("unimplemented")
-}
+// func (s *jwtservice) ValidateToken(token string) (*jwt.Token, error) {
+// 	panic("unimplemented")
+// }
 
 var SECRET_KEY = []byte("BWASTARTUP_s3creT_k3Y")
 
