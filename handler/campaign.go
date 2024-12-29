@@ -1,28 +1,32 @@
 package handler
 
-import "time"
+import (
+	"bwastartup/campaign"
+	"bwastartup/helper"
+	"net/http"
+	"strconv"
 
-type Campaign struct {
-	ID 					int
-	UserID 				int
-	Name 				string
-	ShortDescription 	string
-	Description 		string
-	Perks 				string
-	BackerCount			int
-	GoalAmount 			int
-	CurrentAmount		int
-	Slug				string
-	CreatedAt			time.Time
-	UpdatedAt			time.Time
-	CampaignImages		[]CampaignImage
+	"github.com/gin-gonic/gin"
+)
+
+type campaignHandler struct {
+	service campaign.Service
 }
 
-type CampaignImage struct {
-	ID			int
-	CampaignID 	int
-	FileName 	string
-	IsPrimary 	int
-	CreatedAt	time.Time
-	UpdatedAt	time.Time
+func NewCampaignHandler(service campaign.Service) *campaignHandler {
+	return &campaignHandler{service}
+}
+
+// api/v1/campaigns
+func (h *campaignHandler) GetCampaigns(c *gin.Context) {
+	userID, _ := strconv.Atoi(c.Query("user_id"))
+
+	campaigns, err := h.service.GetCampaigns(userID)
+	if err != nil {
+		response := helper.APIResponse("Error to get campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("List of campaigns", http.StatusOK, "success", campaigns)
+	c.JSON(http.StatusOK, response)
 }
